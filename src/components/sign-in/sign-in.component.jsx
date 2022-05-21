@@ -1,14 +1,8 @@
 import { useState, useContext } from "react";
-import {
-  Grid,
-  Paper,
-  Avatar,
-  TextField,
-  Button,
-  Typography,
-  Link,
-} from "@mui/material";
+import { Grid, Paper, Avatar, TextField, Button } from "@mui/material";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
+import { SignInUser } from "../../services/rails-api/api.utils";
+import { UserContext } from "../../contexts/user.context";
 
 const defaultFormFields = {
   email: "",
@@ -18,6 +12,7 @@ const defaultFormFields = {
 export const SignIn = () => {
   const [formFields, setFormFields] = useState(defaultFormFields);
   const { email, password } = formFields;
+  const { setCurrentUser } = useContext(UserContext);
   const resetFormFields = () => {
     setFormFields(defaultFormFields);
   };
@@ -28,8 +23,19 @@ export const SignIn = () => {
     setFormFields({ ...formFields, [name]: value });
   };
 
-  const handleSubmit = () => {
-    resetFormFields();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const data = await SignInUser(email, password);
+    if (data.data.id) {
+      const user = {
+        id: data.data.id,
+        email: data.data.email,
+      };
+      setCurrentUser(user);
+      resetFormFields();
+    } else {
+      return alert(data.status.message);
+    }
   };
   const paperStyle = {
     padding: 40,
@@ -89,27 +95,3 @@ export const SignIn = () => {
     </Grid>
   );
 };
-
-// fetch("http://localhost:3000/login", {
-//   method: "post",
-//   headers: {
-//     "Content-Type": "application/json",
-//   },
-//   body: JSON.stringify({
-//     user: {
-//       email: "test@test.com",
-//       password: "password",
-//     },
-//   }),
-// })
-//   .then((res) => {
-//     if (res.ok) {
-//       console.log(res.headers.get("Authorization"));
-//       localStorage.setItem("token", res.headers.get("Authorization"));
-//       return res.json();
-//     } else {
-//       return res.text().then((text) => Promise.reject(text));
-//     }
-//   })
-//   .then((json) => console.dir(json))
-//   .catch((err) => console.error(err));

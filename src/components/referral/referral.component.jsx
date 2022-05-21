@@ -2,11 +2,13 @@ import { useState, useContext } from "react";
 import { Grid, Paper, Avatar, TextField, Button } from "@mui/material";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import SendIcon from "@mui/icons-material/Send";
+import { UserContext } from "../../contexts/user.context";
 
 const defaultEmailField = "";
 
 export const Referral = () => {
   const [email, setEmail] = useState(defaultEmailField);
+  const { currentUser } = useContext(UserContext);
   const resetEmailField = () => {
     setEmail(defaultEmailField);
   };
@@ -14,7 +16,31 @@ export const Referral = () => {
     setEmail(event.target.value);
   };
   const handleSubmit = () => {
-    resetEmailField();
+    const options = {
+      user: currentUser,
+      email: email,
+    };
+    const requestOptions = {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        options,
+      }),
+    };
+    fetch("http://localhost:3001/send_email", requestOptions)
+      .then((res) => {
+        if (res.ok) {
+          resetEmailField();
+          alert("email has been sent");
+          return res.json();
+        } else {
+          throw new Error(res);
+        }
+      })
+      //   .then((json) => console.dir(json))
+      .catch((err) => console.log(err));
   };
   const paperStyle = {
     padding: 40,

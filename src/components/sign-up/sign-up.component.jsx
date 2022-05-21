@@ -1,6 +1,8 @@
 import { useState, useContext } from "react";
 import { Grid, Paper, Avatar, TextField, Button } from "@mui/material";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
+import { SignUpUser } from "../../services/rails-api/api.utils";
+import { UserContext } from "../../contexts/user.context";
 
 const defaultFormFields = {
   email: "",
@@ -14,14 +16,26 @@ export const SignUp = () => {
     setFormFields(defaultFormFields);
   };
 
+  const { setCurrentUser } = useContext(UserContext);
   const handleChange = (event) => {
     const { name, value } = event.target;
 
     setFormFields({ ...formFields, [name]: value });
   };
 
-  const handleSubmit = () => {
-    resetFormFields();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const data = await SignUpUser(email, password);
+    if ({ data }) {
+      const user = {
+        id: data.data.id,
+        email: data.data.email,
+      };
+      setCurrentUser(user);
+      resetFormFields();
+    } else {
+      return alert(data.status.message);
+    }
   };
   const paperStyle = {
     padding: 40,
@@ -81,27 +95,3 @@ export const SignUp = () => {
     </Grid>
   );
 };
-
-// fetch("http://localhost:3000/login", {
-//   method: "post",
-//   headers: {
-//     "Content-Type": "application/json",
-//   },
-//   body: JSON.stringify({
-//     user: {
-//       email: "test@test.com",
-//       password: "password",
-//     },
-//   }),
-// })
-//   .then((res) => {
-//     if (res.ok) {
-//       console.log(res.headers.get("Authorization"));
-//       localStorage.setItem("token", res.headers.get("Authorization"));
-//       return res.json();
-//     } else {
-//       return res.text().then((text) => Promise.reject(text));
-//     }
-//   })
-//   .then((json) => console.dir(json))
-//   .catch((err) => console.error(err));
