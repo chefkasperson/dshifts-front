@@ -1,7 +1,8 @@
 import { useState, useContext } from "react";
 import { Grid, Paper, Avatar, TextField, Button } from "@mui/material";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
-import { SignUpUser } from "../../services/rails-api/api.utils";
+// import { SignUpUser } from "../../services/rails-api/api.utils";
+import { createNewUser } from "../../services/rails-api/api.utils";
 import { UserContext } from "../../contexts/user.context";
 
 const defaultFormFields = {
@@ -25,16 +26,16 @@ export const SignUp = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const data = await SignUpUser(email, password);
-    if ({ data }) {
+    resetFormFields();
+    const data = await createNewUser(email, password);
+    if (data.data.id) {
       const user = {
         id: data.data.id,
         email: data.data.email,
       };
       setCurrentUser(user);
-      resetFormFields();
     } else {
-      return alert(data.status.message);
+      return alert("Sign Up not successful, please try again");
     }
   };
   const paperStyle = {

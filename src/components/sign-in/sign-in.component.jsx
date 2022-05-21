@@ -25,6 +25,7 @@ export const SignIn = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    resetFormFields();
     const data = await SignInUser(email, password);
     if (data.data.id) {
       const user = {
@@ -32,9 +33,8 @@ export const SignIn = () => {
         email: data.data.email,
       };
       setCurrentUser(user);
-      resetFormFields();
     } else {
-      return alert(data.status.message);
+      return alert("Could not sign in, please try again");
     }
   };
   const paperStyle = {

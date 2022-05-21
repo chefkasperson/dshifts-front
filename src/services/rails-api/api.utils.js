@@ -1,8 +1,8 @@
-export const SignUpUser = async (email, password) => {
-  if (!email || !password) return;
+// export const SignUpUser = async (email, password) => {
+//   if (!email || !password || email == "" || password == "") return;
 
-  return await createNewUser(email, password);
-};
+//   return await createNewUser(email, password);
+// };
 
 export const SignInUser = async (email, password) => {
   const user = { email, password };
@@ -21,16 +21,20 @@ export const SignInUser = async (email, password) => {
       "http://localhost:3001/login",
       requestOptions
     );
-    const data = await fetchResponse;
-    localStorage.setItem("token", data.headers.get("Authorization"));
-    return data.json();
+    if (fetchResponse.ok) {
+      const data = await fetchResponse;
+      localStorage.setItem("token", data.headers.get("Authorization"));
+      return data.json();
+    } else {
+      throw new Error(fetchResponse);
+    }
   } catch (error) {
-    console.log(error);
+    alert("Failed to Login, please try again.");
     return error;
   }
 };
 
-const createNewUser = async (email, password) => {
+export const createNewUser = async (email, password) => {
   const user = { email, password };
   const requestOptions = {
     method: "post",
@@ -47,11 +51,15 @@ const createNewUser = async (email, password) => {
       "http://localhost:3001/signup",
       requestOptions
     );
-    const data = await fetchResponse;
-    localStorage.setItem("token", data.headers.get("Authorization"));
-    return data.json();
+    if (fetchResponse.ok) {
+      const data = await fetchResponse;
+      localStorage.setItem("token", data.headers.get("Authorization"));
+      return data.json();
+    } else {
+      throw new Error(fetchResponse);
+    }
   } catch (error) {
-    console.log(error);
+    alert("Could not Create User, please try again");
     return error;
   }
 };

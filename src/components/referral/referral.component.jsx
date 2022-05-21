@@ -33,13 +33,12 @@ export const Referral = () => {
       .then((res) => {
         if (res.ok) {
           resetEmailField();
-          alert("email has been sent");
           return res.json();
         } else {
           throw new Error(res);
         }
       })
-      //   .then((json) => console.dir(json))
+      .then((json) => alert(json.message))
       .catch((err) => console.log(err));
   };
   const paperStyle = {
